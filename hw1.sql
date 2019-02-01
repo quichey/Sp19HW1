@@ -121,13 +121,35 @@ AS
 -- Question 4i
 CREATE VIEW q4i(yearid, min, max, avg, stddev)
 AS
-  SELECT 1, 1, 1, 1, 1 -- replace this line
+  SELECT yearid, MIN(salary), MAX(salary), AVG(salary), STDDEV(salary)
+  FROM salaries
+  GROUP BY yearid
+  ORDER BY yearid ASC
 ;
 
 -- Question 4ii
 CREATE VIEW q4ii(binid, low, high, count)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  WITH ints (yearid, min, max, range) AS
+    (SELECT yearid, CAST(min AS int), CAST(max AS int), CAST(max - min AS int) / 10
+    FROM q4i
+    WHERE yearid = 2016
+    LIMIT 1),
+    bins (playerid, binid) AS
+    (SELECT playerid, (CAST(salary AS int) - min) / range
+    FROM salaries, ints
+    WHERE salaries.yearid = ints.yearid),
+    fixedbins (playerid, binid) AS
+    (SELECT playerid, 
+      CASE WHEN binid < 10 THEN binid
+            ELSE binid - 1 END
+    FROM bins)
+  -- MAX(min) + binid*MAX(range), MAX(min) + (binid + 1)*MAX(range)
+  SELECT binid, MAX(min) + binid*MAX(range), MAX(min) + (binid + 1)*MAX(range), COUNT(*)
+  FROM fixedbins, ints
+  GROUP BY binid
+  ORDER BY binid ASC
+
 ;
 
 -- Question 4iii
