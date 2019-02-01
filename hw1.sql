@@ -72,7 +72,13 @@ AS
 -- Question 3i
 CREATE VIEW q3i(playerid, namefirst, namelast, yearid, slg)
 AS
-  SELECT 1, 1, 1, 1, 1 -- replace this line
+  SELECT b.playerid, p.namefirst, p.namelast, b.yearid,
+    CAST(b.h + b.h2b + 2*b.h3b + 3*b.hr AS float) 
+    / CAST(b.ab AS float) AS slg
+  FROM batting AS b, people AS p
+  WHERE b.playerid = p.playerid AND b.ab > 50
+  ORDER BY slg DESC, b.yearid ASC
+  LIMIT 10
 ;
 
 -- Question 3ii
