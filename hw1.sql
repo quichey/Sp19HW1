@@ -1,7 +1,7 @@
 DROP VIEW IF EXISTS q0, q1i, q1ii, q1iii, q1iv, q2i, q2ii, q2iii, q3i, q3ii, q3iii, q4i, q4ii, q4iii, q4iv, q4v;
 
 -- Question 0
-CREATE VIEW q0(era) 
+CREATE VIEW q0(era)
 AS
   SELECT MAX(era)
   FROM pitching
@@ -44,13 +44,20 @@ AS
 -- Question 2i
 CREATE VIEW q2i(namefirst, namelast, playerid, yearid)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  SELECT namefirst, namelast, playerid, yearid
+  FROM people NATURAL JOIN halloffame
+  WHERE inducted = 'Y'
+  ORDER BY yearid DESC
 ;
 
 -- Question 2ii
 CREATE VIEW q2ii(namefirst, namelast, playerid, schoolid, yearid)
 AS
-  SELECT 1, 1, 1, 1, 1 -- replace this line
+  SELECT q.namefirst, q.namelast, q.playerid, c.schoolid, q.yearid
+  FROM q2i AS q, collegeplaying AS c, schools AS s
+  WHERE q.playerid = c.playerid AND c.schoolid = s.schoolid
+    AND s.schoolstate = 'CA'
+  ORDER BY q.yearid DESC, c.schoolid ASC, q.playerid ASC
 ;
 
 -- Question 2iii
@@ -104,4 +111,3 @@ AS
 CREATE VIEW q4v(team, diffAvg) AS
   SELECT 1, 1 -- replace this line
 ;
-
