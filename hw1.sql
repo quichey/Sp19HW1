@@ -100,7 +100,22 @@ AS
 -- Question 3iii
 CREATE VIEW q3iii(namefirst, namelast, lslg)
 AS
-  SELECT 1, 1, 1 -- replace this line
+  WITH lifetimebat (playerid, h, h2b, h3b, hr, ab) AS
+    (SELECT playerid, SUM(h), SUM(h2b), SUM(h3b), SUM(hr), SUM(ab)
+    FROM batting
+    GROUP BY playerid),
+    lifetimeslug (playerid, slug, ab) AS
+    (SELECT playerid, CAST(h + h2b + 2*h3b + 3*hr AS float)
+    / CAST(ab AS float), ab
+    FROM lifetimebat
+    WHERE ab > 0),
+    targetPlayerSlug (slug) AS
+    (SELECT slug
+    FROM lifetimeslug
+    WHERE playerid = 'mayswi01')
+  SELECT namefirst, namelast, l.slug
+  FROM lifetimeslug AS l, targetPlayerSlug AS t, people AS p
+  WHERE l.slug > t.slug AND l.playerid = p.playerid AND ab > 50
 ;
 
 -- Question 4i
