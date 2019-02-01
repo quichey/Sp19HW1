@@ -63,7 +63,10 @@ AS
 -- Question 2iii
 CREATE VIEW q2iii(playerid, namefirst, namelast, schoolid)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  SELECT q.playerid, q.namefirst, q.namelast, c.schoolid
+  FROM q2i AS q LEFT JOIN collegeplaying AS c
+  ON q.playerid = c.playerid
+  ORDER BY q.playerid DESC, c.schoolid ASC
 ;
 
 -- Question 3i
