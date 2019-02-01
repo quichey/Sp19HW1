@@ -73,7 +73,7 @@ AS
 CREATE VIEW q3i(playerid, namefirst, namelast, yearid, slg)
 AS
   SELECT b.playerid, p.namefirst, p.namelast, b.yearid,
-    CAST(b.h + b.h2b + 2*b.h3b + 3*b.hr AS float) 
+    CAST(b.h + b.h2b + 2*b.h3b + 3*b.hr AS float)
     / CAST(b.ab AS float) AS slg
   FROM batting AS b, people AS p
   WHERE b.playerid = p.playerid AND b.ab > 50
@@ -84,7 +84,17 @@ AS
 -- Question 3ii
 CREATE VIEW q3ii(playerid, namefirst, namelast, lslg)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  WITH lifetimebat (playerid, h, h2b, h3b, hr, ab) AS
+    (SELECT playerid, SUM(h), SUM(h2b), SUM(h3b), SUM(hr), SUM(ab)
+    FROM batting
+    GROUP BY playerid)
+  SELECT b.playerid, p.namefirst, p.namelast,
+    CAST(b.h + b.h2b + 2*b.h3b + 3*b.hr AS float)
+    / CAST(b.ab AS float) AS lslg
+  FROM lifetimebat AS b, people AS p
+  WHERE b.playerid = p.playerid AND b.ab > 50
+  ORDER BY lslg DESC, b.playerid ASC
+  LIMIT 10
 ;
 
 -- Question 3iii
