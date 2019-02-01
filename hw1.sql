@@ -140,7 +140,7 @@ AS
     FROM salaries, ints
     WHERE salaries.yearid = ints.yearid),
     fixedbins (playerid, binid) AS
-    (SELECT playerid, 
+    (SELECT playerid,
       CASE WHEN binid < 10 THEN binid
             ELSE binid - 1 END
     FROM bins)
@@ -155,13 +155,24 @@ AS
 -- Question 4iii
 CREATE VIEW q4iii(yearid, mindiff, maxdiff, avgdiff)
 AS
-  SELECT 1, 1, 1, 1 -- replace this line
+  SELECT this.yearid, this.min - previous.min, this.max - previous.max,
+    this.avg - previous.avg
+  FROM q4i AS this, q4i AS previous
+  WHERE previous.yearid = this.yearid - 1
+  ORDER BY this.yearid ASC
 ;
 
 -- Question 4iv
 CREATE VIEW q4iv(playerid, namefirst, namelast, salary, yearid)
 AS
-  SELECT 1, 1, 1, 1, 1 -- replace this line
+  WITH targetSalaries (yearid, max) AS
+    (SELECT yearid, max
+    FROM q4i
+    WHERE yearid = 2000 OR yearid = 2001)
+  SELECT p.playerid, p.namefirst, p.namelast, s.salary, s.yearid
+  FROM people AS p, salaries AS s, targetSalaries AS t
+  WHERE p.playerid = s.playerid AND
+    (s.yearid = t.yearid AND s.salary = t.max)
 ;
 -- Question 4v
 CREATE VIEW q4v(team, diffAvg) AS
